@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { getWeatherToday } from 'AppRedux';
-import { Api } from 'AppApi';
 
 class HomeScreen extends PureComponent {
   
@@ -24,9 +23,6 @@ class HomeScreen extends PureComponent {
 
   componentDidMount() {
     this.props.getWeatherToday(this.state.lat, this.state.lon);
-    Api.getDataWeather(this.state.lat, this.state.lon).then((res) => {
-      console.log(res)
-    })
   }
 
   render() {

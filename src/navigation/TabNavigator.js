@@ -7,7 +7,7 @@ const TabNavigator = createStackNavigator(
   {
     Home: {
       navigationOptions: {
-        title: 'Home',
+        title: 'Weather at your location',
       },
       params: { banner: 'Home Screen' },
       path: '/',

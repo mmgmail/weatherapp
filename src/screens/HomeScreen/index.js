@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import {
-  Text,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -9,6 +8,8 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { getWeatherToday } from 'AppRedux';
+import moment from 'moment';
+import { Button, Image, Text, Divider } from 'react-native-elements';
 
 class HomeScreen extends PureComponent {
   
@@ -17,12 +18,23 @@ class HomeScreen extends PureComponent {
     
     this.state = {
       lat: 50.40,
-      lon: 30.61
+      lon: 30.61,
+      date: new Date()
     }
   }
 
   componentDidMount() {
     this.props.getWeatherToday(this.state.lat, this.state.lon);
+  }
+
+  componentDidUpdate(nextProps, nextState) {
+    if(nextState.date !== this.state.date) {
+      this.props.getWeatherToday(this.state.lat, this.state.lon);
+    }
+  }
+
+  onHandlerUpdateDate = () => {
+    this.setState({ date: new Date() });
   }
 
   render() {
@@ -31,14 +43,16 @@ class HomeScreen extends PureComponent {
     // const { latitude, longitude } = region;
     
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={container}>
         <View>
           {isLoading 
             ? <ActivityIndicator color={'black'} />
             : weatherData ? 
                 <View>
-                  <Text>{ `${weatherData.name}, ${Math.floor(weatherData.main.temp)}°C` }</Text>
-                  <Text>{ weatherData.weather[0].description }</Text>
+                  <Image source={{ uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png` }} />
+                  <Text h2 style={textCenter}>{ `${weatherData.name}, ${Math.floor(weatherData.main.temp)}°C` }</Text>
+                  <Text h3 style={textCenter}>{ weatherData.weather[0].description }</Text>
+                  <Divider style={mVertical} />
                 </View>
             : error ? 
                 <View>
@@ -46,6 +60,15 @@ class HomeScreen extends PureComponent {
                 </View> : <View />
           } 
         </View>
+        <View>
+          <Text h4 style={textCenter}>{ moment(this.state.date).format('LLL') }</Text>
+          <Divider style={mVertical} />
+        </View>
+        <Button
+          type="solid"
+          title="Update weather"
+          onPress={this.onHandlerUpdateDate}
+        />
       </SafeAreaView>
     );
   }
@@ -56,8 +79,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  textCenter: {
+    textAlign: 'center'
+  },
+  mVertical: {
+    marginVertical: 15
   }
 });
+
+const { container, textCenter, mVertical } = styles;
 
 const mapStateToProps = (state) => {
   return {

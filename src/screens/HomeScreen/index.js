@@ -49,7 +49,7 @@ class HomeScreen extends PureComponent {
             ? <ActivityIndicator color={'black'} />
             : weatherData ? 
                 <View>
-                  <Image source={{ uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png` }} />
+                  <Image style={{ height: 60, resizeMode: 'contain' }} source={{ uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png` }} />
                   <Text h2 style={textCenter}>{ `${weatherData.name}, ${Math.floor(weatherData.main.temp)}°C` }</Text>
                   <Text h3 style={textCenter}>{ weatherData.weather[0].description }</Text>
                   <Divider style={mVertical} />

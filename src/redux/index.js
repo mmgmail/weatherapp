@@ -1,4 +1,3 @@
 export { 
-	getWeatherToday,
-	resetParams
+	getWeatherToday
 } from './actions';

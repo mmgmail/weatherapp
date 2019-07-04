@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   SafeAreaView,
   ActivityIndicator
 } from 'react-native';
@@ -39,36 +38,36 @@ class HomeScreen extends PureComponent {
 
   render() {
     const { weatherData, error, isLoading } = this.props;
-    // const { showMarker, region } = this.state;
-    // const { latitude, longitude } = region;
-    
+
     return (
       <SafeAreaView style={container}>
-        <View>
-          {isLoading 
-            ? <ActivityIndicator color={'black'} />
-            : weatherData ? 
-                <View>
-                  <Image style={{ height: 60, resizeMode: 'contain' }} source={{ uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png` }} />
-                  <Text h2 style={textCenter}>{ `${weatherData.name}, ${Math.floor(weatherData.main.temp)}°C` }</Text>
-                  <Text h3 style={textCenter}>{ weatherData.weather[0].description }</Text>
-                  <Divider style={mVertical} />
-                </View>
-            : error ? 
-                <View>
-                  <Text style={{ color: 'red' }}>{`Thomething went wrong!\n${error}`}</Text>
-                </View> : <View />
-          } 
+        <View style={centered}>
+          <View>
+            {isLoading 
+              ? <ActivityIndicator color={'black'} />
+              : weatherData ? 
+                  <View>
+                    <Image style={{ height: 60, resizeMode: 'contain' }} source={{ uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png` }} />
+                    <Text h2 style={textCenter}>{ `${weatherData.name}, ${Math.floor(weatherData.main.temp)}°C` }</Text>
+                    <Text h3 style={textCenter}>{`humidity: ${weatherData.main.humidity}%, `}{ weatherData.weather[0].description }</Text>
+                    <Divider style={mVertical} />
+                  </View>
+              : error ? 
+                  <View>
+                    <Text style={{ color: 'red' }}>{`Thomething went wrong!\n${error}`}</Text>
+                  </View> : <View />
+            } 
+          </View>
+          <View>
+            <Text h4 style={textCenter}>{ moment(this.state.date).format('LLL') }</Text>
+            <Divider style={mVertical} />
+          </View>
+          <Button
+            type="solid"
+            title="Update weather"
+            onPress={this.onHandlerUpdateDate}
+          />
         </View>
-        <View>
-          <Text h4 style={textCenter}>{ moment(this.state.date).format('LLL') }</Text>
-          <Divider style={mVertical} />
-        </View>
-        <Button
-          type="solid"
-          title="Update weather"
-          onPress={this.onHandlerUpdateDate}
-        />
       </SafeAreaView>
     );
   }
@@ -78,7 +77,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: 'beige'
+  },
+  centered: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    backgroundColor: 'azure'
   },
   textCenter: {
     textAlign: 'center'
@@ -88,7 +95,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const { container, textCenter, mVertical } = styles;
+const { container, textCenter, mVertical, centered } = styles;
 
 const mapStateToProps = (state) => {
   return {

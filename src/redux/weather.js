@@ -19,12 +19,6 @@ const weather = (state = {}, action) => {
 				isLoading: false
 			}
 		}
-		case 'RESET_PARAMS':
-			return {
-				...state,
-				todayWeather: action.payload,
-				isLoading: false
-			}
 		default:
 			return state
 	}

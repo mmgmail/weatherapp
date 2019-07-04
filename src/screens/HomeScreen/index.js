@@ -5,7 +5,6 @@ import {
   SafeAreaView,
   ActivityIndicator,
   PermissionsAndroid,
-  Alert,
   Platform
 } from 'react-native';
 import { connect } from 'react-redux';
@@ -22,7 +21,8 @@ class HomeScreen extends PureComponent {
     this.state = {
       lat: null,
       lon: null,
-      date: new Date()
+      date: new Date(),
+      error: false
     }
   }
 
@@ -30,16 +30,7 @@ class HomeScreen extends PureComponent {
     if(Platform.OS === 'android') {
       this.requestLocationRuntimePermission();
     } else {
-      this.getGeolocation()
-        .then(position => {
-          this.setState({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude
-          })
-        })
-        .then(() => {
-          this.props.getWeatherToday(this.state.lat, this.state.lon);
-        });
+      this.handlerSetPosition();
     }
   }
 
@@ -63,6 +54,24 @@ class HomeScreen extends PureComponent {
     })
   }
 
+  handlerSetPosition() {
+    this.getGeolocation()
+      .then((position) => {
+        if(position) {
+          this.setState({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          })
+        }
+      })
+      .then(() => {
+        this.props.getWeatherToday(this.state.lat, this.state.lon);
+      })
+      .catch(() => {
+        this.setState({ error: true })
+      })
+  }
+
   async requestLocationRuntimePermission() {
     try {
       const granted = await PermissionsAndroid.request(
@@ -73,19 +82,10 @@ class HomeScreen extends PureComponent {
         }
       )
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.getGeolocation()
-          .then(position => {
-            this.setState({
-              lat: position.coords.latitude,
-              lon: position.coords.longitude
-            })
-          })
-          .then(() => {
-            this.props.getWeatherToday(this.state.lat, this.state.lon);
-          });
+        this.handlerSetPosition();
       }
       else {
-        Alert.alert("Location Permission Not Granted");
+        this.setState({ error: true })
       }
     } catch (err) {
       console.warn(err)
@@ -101,7 +101,7 @@ class HomeScreen extends PureComponent {
 
     return (
       <SafeAreaView style={container}>
-        {this.state.lat && this.state.lon 
+        {this.state.lat && this.state.lon && !this.state.error
           ? <View style={centered}>
             <View>
               {isLoading 
@@ -113,10 +113,11 @@ class HomeScreen extends PureComponent {
                       <Text h3 style={textCenter}>{`humidity: ${weatherData.main.humidity}%, `}{ weatherData.weather[0].description }</Text>
                       <Divider style={mVertical} />
                     </View>
-                : error ? 
+                : this.state.error ? 
                     <View>
                       <Text style={{ color: 'red' }}>{`Thomething went wrong!\n${error}`}</Text>
-                    </View> : <View />
+                    </View> 
+                : null
               } 
             </View>
             <View>
@@ -129,6 +130,9 @@ class HomeScreen extends PureComponent {
               onPress={this.onHandlerUpdateDate}
             />
           </View> 
+        : this.state.error
+        ? <View style={centered}>
+            <Text style={textCenter}>{'Location permissions should be allowed'}</Text></View>
         : null}
       </SafeAreaView>
     );
